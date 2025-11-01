@@ -1,0 +1,138 @@
+# GRPO Configuration for Gemma-3 English-Hindi Translation
+# Based on Unsloth GRPO training approach with MT metrics rewards
+
+seed: 44
+
+# Model configuration
+model:
+  model_name: "./outputs/sft_qwen3_32b_merged"
+  max_seq_length: 2048
+  load_in_4bit: true
+  load_in_8bit: false
+  full_finetuning: false
+
+  # LoRA parameters
+  lora_rank: 1
+  lora_alpha: 1
+  lora_dropout: 0
+  bias: "none"
+
+  # Layer finetuning
+  finetune_attention_modules: true
+  finetune_mlp_modules: true
+
+  # inference (vllm)
+  fast_inference: true
+  gpu_memory_utilization: 0.5
+
+# Data configuration
+data:
+  dataset_name: "VISAI-AI/JustNLP-MT"
+  split: "train"
+  source_column: "Source"
+  translation_column: "Translation"
+  difficulty_column: "Difficulty"
+
+  # Filter by difficulty levels (null = use all)
+  difficulty_levels: ["high", "very_high"]
+
+  # Maximum samples to use (null = use all)
+  max_samples: null
+
+# Template configuration
+template:
+  chat_template: "qwen-3"
+  system_prompt: "You are an expert English to Hindi translator. Provide accurate translations while maintaining the original meaning, tone, and context. Output format must be: start with <think> and write your reasoning in it, then close with </think> and answer the best Hindi legal translation from the given English source."
+
+# Reward function configuration
+# Enable/disable specific reward functions for different experiments
+rewards:
+  # Stanza configuration for tokenization (used by BLEU and ROUGE)
+  stanza_lang: "hi"  # Hindi
+  stanza_download: true
+
+  # Check format output
+  check_format:
+    enable: true
+    weight: 1.0
+
+  # Check allow characters
+  allow_char:
+    enable: true
+    weight: 1.0
+
+  # BLEU score reward
+  bleu:
+    enabled: false
+    weight: 1.0  # Weight for BLEU score (0-1 range after normalization)
+
+  # ROUGE score reward
+  rouge:
+    enabled: false
+    weight: 1.0  # Weight for ROUGE score (0-1 range)
+
+  # chrF++ score reward
+  chrf:
+    enabled: true
+    weight: 1.0  # Weight for chrF++ score (0-1 range after normalization)
+
+  # Semantic similarity reward (requires BGE-M3 service)
+  semantic_similarity:
+    enabled: false  # Set to true if BGE-M3 service is available
+    weight: 1.0  # Weight for semantic similarity
+    service_url: "http://10.204.100.195:44001"
+    max_passage_length: 512
+    weights: [0.4, 0.2, 0.4]  # Weights for dense, sparse, and colbert modes
+  
+  # COMET score reward (requires COMET service)
+  comet:
+    enabled: false  # Set to true if COMET service is available
+    weight: 1.0  # Weight for COMET score
+    use_service: true
+    service_url: "http://10.204.100.195:44002"
+    batch_size: 32
+
+  # Print examples for monitoring
+  print_examples:
+    enabled: true
+
+# GRPO training configuration
+grpo:
+  learning_rate: 1.0e-4
+  adam_beta1: 0.9
+  adam_beta2: 0.99
+  weight_decay: 0.1
+  warmup_ratio: 0.1
+  lr_scheduler_type: "cosine"
+  optim: "adamw_torch_fused"
+
+  # Batch and generation settings
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 1  # Increase to 4 for smoother training
+  num_generations: 32  # Number of generations per prompt
+
+  # Sequence length settings
+  max_prompt_length: 512
+
+  # Training steps
+  num_train_epochs: 1  # Set to null to use max_steps instead
+  save_strategy: "epoch"  # or "steps"
+
+  # Gradient clipping
+  max_grad_norm: 0.2
+
+  # Logging
+  logging_steps: 1
+
+# Logging configuration
+logging:
+  report_to: "wandb"  # Options: "wandb", "tensorboard", "none"
+  wandb_project: "JustNLP-MT"
+  wandb_run_name: "grpo_qwen3_32b_chrf"
+  print_every_steps: 1  # Print example outputs every N steps
+
+# Output configuration
+output:
+  save_lora_path: "outputs/grpo_qwen3_32b_chrf"
+  save_merged: true  # Set to true to also save merged model
+  save_gguf: false
