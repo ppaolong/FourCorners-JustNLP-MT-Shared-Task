@@ -18,7 +18,7 @@ model:
 
 # Data Configuration
 data:
-  dataset_name: "VISAI-AI/JustNLP-MT"  # Hugging Face dataset name
+  dataset_name: "JustNLP-MT"  # Hugging Face dataset name
   split: "train"  # Dataset split to use
   source_column: "Source"
   translation_column: "Translation"

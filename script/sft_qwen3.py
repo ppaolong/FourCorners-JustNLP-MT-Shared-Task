@@ -161,7 +161,7 @@ def load_and_prepare_data(config: Dict[str, Any], tokenizer):
     template_config = config['template']
 
     # Load dataset from Hugging Face
-    dataset_name = data_config.get('dataset_name', 'VISAI-AI/JustNLP-MT')
+    dataset_name = data_config.get('dataset_name')
     split = data_config.get('split', 'train')
 
     print(f"Loading dataset {dataset_name} (split: {split})...")

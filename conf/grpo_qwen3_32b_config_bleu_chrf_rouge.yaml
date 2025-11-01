@@ -27,7 +27,7 @@ model:
 
 # Data configuration
 data:
-  dataset_name: "VISAI-AI/JustNLP-MT"
+  dataset_name: "JustNLP-MT"
   split: "train"
   source_column: "Source"
   translation_column: "Translation"
