@@ -5,6 +5,7 @@ parser.add_argument("--model", "-m")
 args = parser.parse_args()
 import re
 import html
+import os
 import string
 
 def clean_pipeline(text):
@@ -81,6 +82,8 @@ answers = [line.outputs[0].text.split("</think>")[-1].strip() for line in output
 output_df = pd.DataFrame()
 output_df["ID"] = val["ID"]
 output_df["Translation"] = answers
+
+os.makedirs("./results/", exist_ok=True)
 
 output_df.to_csv(f"./results/{args.model}.csv", index=False, encoding="utf8")
 

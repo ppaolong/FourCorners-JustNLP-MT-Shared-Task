@@ -1,6 +1,7 @@
 import re
 import html
 import string
+import os
 
 def clean_pipeline(text):
     """
@@ -77,5 +78,6 @@ output_df = pd.DataFrame()
 output_df["ID"] = val["ID"]
 output_df["Translation"] = answers
 
+os.makedirs("./results/", exist_ok=True)
 output_df.to_csv(f"./results/qwen3_32b_baseline.csv", index=False, encoding="utf8")
 

@@ -10,10 +10,9 @@ playground
 .env
 deprecated
 trainer_output
-outputs
 summarization
-README.md
 src
+outputs/**/
 reward_services
 script/val
 translation
